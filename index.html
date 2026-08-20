@@ -141,8 +141,12 @@
           <a class="contact-line" href="mailto:travel@guninaholidays.in">✉️ <span><strong>Email</strong><small>travel@guninaholidays.in</small></span></a>
           <div class="contact-line">📍 <span><strong>Location</strong><small>Shop No. 03, Kapoor Tower, Building No. 03, Jesal Park, Bhayander (East), Mira-Bhayander, Mumbai - 401105</small></span></div>
         </div>
-        <form id="quoteForm" class="quote-form">
+        <form id="quoteForm" class="quote-form" action="https://formsubmit.co/travel@guninaholidays.in" method="POST">
+          <input type="hidden" name="_subject" value="New Website Enquiry - Gunina Holidays">
+          <input type="hidden" name="_template" value="table">
+          <input type="hidden" name="_next" value="https://gunina2026.github.io/Gunina-Holidays/">
           <div class="form-row"><label>Name<input name="name" required placeholder="Your name"></label><label>Phone<input name="phone" required placeholder="+91 XXXXX XXXXX"></label></div>
+          <label>Email<input name="email" type="email" required placeholder="your@email.com"></label>
           <div class="form-row"><label>Destination<input name="destination" required placeholder="e.g. Japan"></label><label>Travel Date<input name="date" type="date"></label></div>
           <label>What service do you need?<select name="service"><option>Custom Holiday Tour Package</option><option>Flight & Hotel Bookings</option><option>Sightseeing & Guided Tours</option><option>Travel Insurance</option><option>Visa Assistance</option><option>Complete Travel Planning</option></select></label>
           <label>Message<textarea name="message" rows="4" placeholder="Tell us about your trip, number of travelers, budget, etc."></textarea></label>
