@@ -1,8 +1,7 @@
 GUNINA HOLIDAYS WEBSITE
 =======================
 
-The enquiry form is connected to FormSubmit and is configured to send website enquiries to:
-travel@guninaholidays.in
+The enquiry form is configured to send website enquiries to: travel@guninaholidays.in
 
 
 Business details:
