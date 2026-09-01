@@ -1,65 +1,157 @@
-const menu = document.querySelector(".menu-toggle");
-const nav = document.querySelector(".nav-links");
+/* Gunina Holidays - site interactions */
 
-menu?.addEventListener("click", () => nav.classList.toggle("open"));
-document.querySelectorAll(".nav-links a").forEach((link) => {
-  link.addEventListener("click", () => nav.classList.remove("open"));
-});
+(function () {
+  'use strict';
 
-// Gunina Holidays enquiry form - Web3Forms
-const quoteForm = document.getElementById("quoteForm");
-const formMessage = document.getElementById("formMessage");
+  document.addEventListener('DOMContentLoaded', function () {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const navLinks = document.querySelector('.nav-links');
 
-if (quoteForm && formMessage) {
-  quoteForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-
-    const submitButton = quoteForm.querySelector('button[type="submit"]');
-    const accessKey = quoteForm.querySelector('input[name="access_key"]')?.value.trim();
-
-    formMessage.textContent = "";
-    formMessage.className = "form-message";
-
-    if (!accessKey || accessKey === "YOUR_WEB3FORMS_ACCESS_KEY") {
-      formMessage.textContent = "The enquiry form is not configured. Please contact us on WhatsApp.";
-      formMessage.className = "form-message error";
-      return;
-    }
-
-    if (!quoteForm.checkValidity()) {
-      quoteForm.reportValidity();
-      return;
-    }
-
-    submitButton.disabled = true;
-    submitButton.textContent = "Sending...";
-
-    try {
-      const formData = new FormData(quoteForm);
-      const response = await fetch("https://api.web3forms.com/submit", {
-        method: "POST",
-        headers: {
-          "Accept": "application/json"
-        },
-        body: formData
+    // Mobile navigation
+    if (menuToggle && navLinks) {
+      menuToggle.addEventListener('click', function () {
+        const isOpen = navLinks.classList.toggle('open');
+        menuToggle.setAttribute('aria-expanded', String(isOpen));
+        menuToggle.setAttribute(
+          'aria-label',
+          isOpen ? 'Close navigation menu' : 'Open navigation menu'
+        );
       });
 
-      const result = await response.json();
+      navLinks.querySelectorAll('a').forEach(function (link) {
+        link.addEventListener('click', function () {
+          navLinks.classList.remove('open');
+          menuToggle.setAttribute('aria-expanded', 'false');
+          menuToggle.setAttribute(
+            'aria-label',
+            'Open navigation menu'
+          );
+        });
+      });
 
-      if (response.ok && result.success) {
-        formMessage.textContent = "Thank you! Your enquiry has been submitted successfully. We will contact you shortly.";
-        formMessage.className = "form-message success";
-        quoteForm.reset();
-      } else {
-        throw new Error(result.message || "Unable to submit the enquiry.");
-      }
-    } catch (error) {
-      console.error("Web3Forms submission error:", error);
-      formMessage.textContent = "Sorry, we couldn't submit your enquiry. Please try again or contact us on WhatsApp.";
-      formMessage.className = "form-message error";
-    } finally {
-      submitButton.disabled = false;
-      submitButton.textContent = "Send Enquiry";
+      document.addEventListener('click', function (event) {
+        if (
+          !navLinks.contains(event.target) &&
+          !menuToggle.contains(event.target)
+        ) {
+          navLinks.classList.remove('open');
+          menuToggle.setAttribute('aria-expanded', 'false');
+          menuToggle.setAttribute(
+            'aria-label',
+            'Open navigation menu'
+          );
+        }
+      });
+    }
+
+    // Set the earliest travel date to today.
+    const dateInput = document.querySelector('input[name="date"]');
+
+    if (dateInput) {
+      const today = new Date();
+      const yyyy = today.getFullYear();
+      const mm = String(today.getMonth() + 1).padStart(2, '0');
+      const dd = String(today.getDate()).padStart(2, '0');
+
+      dateInput.min = yyyy + '-' + mm + '-' + dd;
+    }
+
+    // Quote form submission via Web3Forms.
+    const form = document.getElementById('quoteForm');
+    const messageBox = document.getElementById('formMessage');
+
+    if (form && messageBox) {
+      form.addEventListener('submit', async function (event) {
+        event.preventDefault();
+
+        if (!form.checkValidity()) {
+          form.reportValidity();
+          return;
+        }
+
+        const submitButton = form.querySelector('.form-submit');
+        const originalText = submitButton
+          ? submitButton.textContent
+          : '';
+
+        messageBox.className = 'form-message';
+        messageBox.textContent = 'Sending your enquiry...';
+
+        if (submitButton) {
+          submitButton.disabled = true;
+          submitButton.textContent = 'Sending...';
+        }
+
+        try {
+          const formData = new FormData(form);
+
+          const response = await fetch(
+            'https://api.web3forms.com/submit',
+            {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json'
+              },
+              body: formData
+            }
+          );
+
+          const result = await response.json();
+
+          if (response.ok && result.success) {
+            messageBox.className = 'form-message success';
+
+            messageBox.textContent =
+              'Thank you! Your enquiry has been sent successfully. ' +
+              'Gunina Holidays will contact you shortly.';
+
+            form.reset();
+
+            // Restore sensible defaults after reset.
+            const adults = form.querySelector(
+              'input[name="adults"]'
+            );
+
+            const children = form.querySelector(
+              'input[name="children"]'
+            );
+
+            const infants = form.querySelector(
+              'input[name="infants"]'
+            );
+
+            if (adults) adults.value = '1';
+            if (children) children.value = '0';
+            if (infants) infants.value = '0';
+
+            if (dateInput) {
+              dateInput.min = new Date()
+                .toISOString()
+                .split('T')[0];
+            }
+          } else {
+            throw new Error(
+              result.message || 'Unable to send enquiry.'
+            );
+          }
+        } catch (error) {
+          console.error(
+            'Gunina Holidays enquiry error:',
+            error
+          );
+
+          messageBox.className = 'form-message error';
+
+          messageBox.textContent =
+            'Sorry, we could not send your enquiry right now. ' +
+            'Please call 9222336122 or contact us on WhatsApp.';
+        } finally {
+          if (submitButton) {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+          }
+        }
+      });
     }
   });
-}
+})();
